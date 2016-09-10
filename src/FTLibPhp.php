@@ -2,42 +2,84 @@
 
 namespace FeatureToggle;
 
+use GuzzleHttp\Client;
+use \GuzzleHttp\Exception\ConnectException;
+use \GuzzleHttp\Exception\ClientException;
+use \GuzzleHttp\Exception\ServerException;
+
 class FTLibPhp
 {
-    private $customerKey;
-    private $environmentKey;
-    private $options = [
+    const VERSION = '1.0';
+
+    private $_customerKey;
+    private $_environmentKey;
+    private $_options = [
         'api' => 'https://api.featuretoggle.com',
+        'auth' => null,
         'cache_timeout' => 300,
-        'version' => 'v1'
+        'version' => 'v1',
+        'debug' => false
     ];
+
+    private $_gzClient;
 
     public function __construct($customerKey, $environmentKey, $options)
     {
-        $this->customerKey = $customerKey;
-        $this->environmentKey = $environmentKey;
-        $this->options = array_merge($this->options, $options);
-    }
+        $this->_customerKey = $customerKey;
+        $this->_environmentKey = $environmentKey;
+        $this->_options = array_merge($this->_options, $options);
+        $this->_options['auth'] = "{$this->_customerKey}:{$this->_environmentKey}";
 
-    public function apiRequest($endpoint)
-    {
-        $ch = curl_init($endpoint);
-
-        curl_setopt($ch, CURLOPT_URL, $this->options['api'] . $endpoint);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Authorization: ' . $this->customerKey . ':' . $this->environmentKey,
-            'Content-type: application/json',
-            'X-Accept-Version: ' . $this->options['version']
+        $this->_gzClient = new Client(array(
+            'base_uri' => $this->_options['api'],
         ));
 
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-
-        return $response;
     }
+
+    protected function apiRequest($endpoint) {
+        $result = array (
+            'success' => false,
+            'message' => '',
+            'statusCode' => -1,
+            'data' => null
+        );
+        try {
+            $response = $this->_gzClient->request(
+                'GET',
+                $endpoint,
+                array(
+                    'debug' => $this->_options['debug'],
+                    'headers' => array(
+                        'Authorization' => $this->_options['auth'],
+                        'Content-Type' => 'application/json',
+                        'X-Accept-Version' => $this->_options['version'],
+                        'User-Agent' => 'FeatureToggle-PHP/' . self::VERSION
+                    )
+                )
+            );
+            try {
+                $data = json_decode((string) $response->getBody(), true);
+                $result['statusCode'] = $response->getStatusCode();
+                if ($response->getStatusCode() === 200) {
+                    $result['success'] = true;
+                    $result['data'] = $data;
+                } else {
+                    $result['message'] = $data['message'];
+                }
+            } catch (Exception $e) {
+                $result['message'] = 'Error communicating with Feature Toggle';
+            }
+        } catch (ConnectionException $e) {
+            $result['message'] = 'Error communicating with Feature Toggle';
+        } catch (ServerException $e) {
+            $result['message'] = 'Error communicating with Feature Toggle';
+        } catch (ClientException $e) {
+            $result['statusCode'] = $e->getResponse()->getStatusCode();
+            $result['message'] = $e->getResponse()->getBody();
+        }
+        return $result;
+    }
+
 
     public function getFeatures()
     {
