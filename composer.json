@@ -19,7 +19,8 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "guzzlehttp/guzzle": "^6.2"
+        "guzzlehttp/guzzle": "^6.2",
+        "phpfastcache/phpfastcache": "^5.0"
     },
     "autoload": {
         "psr-0": { "FeatureToggle\\": "src/" }

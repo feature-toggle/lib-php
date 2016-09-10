@@ -7,6 +7,8 @@ use \GuzzleHttp\Exception\ConnectException;
 use \GuzzleHttp\Exception\ClientException;
 use \GuzzleHttp\Exception\ServerException;
 
+use phpFastCache\CacheManager;
+
 class FTLibPhp
 {
     const VERSION = '1.0';
@@ -16,12 +18,13 @@ class FTLibPhp
     private $_options = [
         'api' => 'https://api.featuretoggle.com',
         'auth' => null,
-        'cache_timeout' => 300,
+        'cache_timeout' => 300, // in seconds
         'version' => 'v1',
         'debug' => false
     ];
 
     private $_gzClient;
+    private $_cacheManager;
 
     public function __construct($customerKey, $environmentKey, $options)
     {
@@ -34,6 +37,15 @@ class FTLibPhp
             'base_uri' => $this->_options['api'],
         ));
 
+        CacheManager::setDefaultConfig(array(
+            "path" => sys_get_temp_dir(),
+        ));
+        //CacheManager::CachingMethod("phpfastcache");
+        $this->_cacheManager = CacheManager::getInstance('files');
+    }
+
+    public function cleacCache() {
+        $this->_cacheManager->clear();
     }
 
     protected function apiRequest($endpoint) {
@@ -83,11 +95,30 @@ class FTLibPhp
 
     public function getFeatures()
     {
-        return $this->apiRequest('/features');
+        $CachedString = $this->_cacheManager->getItem('features');
+
+        if (is_null($CachedString->get())) {
+            $result = $this->apiRequest('/features');
+
+            $CachedString->set($result['data']['features'])->expiresAfter($this->_options['cache_timeout']);
+            $this->_cacheManager->save($CachedString);
+        }
+
+        return $CachedString->get();
+
     }
 
-    public function isEnabled($feature)
+    public function isEnabled($key)
     {
-        return $this->apiRequest('/features/' . $feature);
+        $CachedString = $this->_cacheManager->getItem($key);
+
+        if (is_null($CachedString->get())) {
+            $result = $this->apiRequest('/features/' . $key);
+
+            $CachedString->set($result['data']['enabled'])->expiresAfter($this->_options['cache_timeout']);
+            $this->_cacheManager->save($CachedString);
+        }
+
+        return $CachedString->get();
     }
 }
