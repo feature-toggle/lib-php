@@ -9,7 +9,7 @@ use \GuzzleHttp\Exception\ServerException;
 
 use phpFastCache\CacheManager;
 
-class FTLibPhp
+class FTClient
 {
     const VERSION = '1.0';
 

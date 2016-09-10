@@ -3,10 +3,10 @@
 namespace FeatureToggle;
 
 require 'vendor/autoload.php';
-include 'FTLibPhp.php';
+include 'FTClient.php';
 
 // Init
-$ft = new FTLibPhp('5d388e5ce26035ac05d91fcfd8fb12ae','edbd9643161d885dd8d58109237d281e', [
+$ft = new FTClient('5d388e5ce26035ac05d91fcfd8fb12ae','edbd9643161d885dd8d58109237d281e', [
     'api' => 'http://127.0.0.1:8000',
     'cache_timeout' => 5,
     'debug' => true
