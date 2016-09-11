@@ -1,12 +1,12 @@
 {
-    "name": "featuretoggle-lib-php",
+    "name": "featuretoggle/lib-php",
     "version": "1.0.0",
     "description": "PHP Library to use Feature Toggle services",
     "title": "Feature Toggle PHP Library",
     "main": "./src",
     "repository": {
         "type": "git",
-        "url": "https://github.com/featuretoggle/lib-php.git"
+        "url": "https://github.com/feature-toggle/lib-php.git"
     },
     "keywords": [
         "featuretoggle",
@@ -20,9 +20,9 @@
     "author": "Feature Toggle <info@featuretoggle.com> (https://featuretoggle.com)",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/featuretoggle/lib-php/issues"
+        "url": "https://github.com/feature-toggle/lib-php/issues"
     },
-    "homepage": "https://github.com/featuretoggle/lib-php",
+    "homepage": "https://github.com/feature-toggle/lib-php",
     "require": {
         "php": ">=5.5.0",
         "guzzlehttp/guzzle": "^6.2",
