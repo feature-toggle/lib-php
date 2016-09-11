@@ -7,7 +7,7 @@ A PHP client library for interacting with [featuretoggle.com](https://featuretog
 Install with [Composer](https://getcomposer.org/)
 
 ```bash
-php composer.phar require featuretoggle/featuretoggle-lib-php
+php composer.phar require featuretoggle/lib-php
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ array(
 ```
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/featuretoggle/featuretoggle-lib-php.
+Bug reports and pull requests are welcome on GitHub at https://github.com/featuretoggle/lib-php.
 
 
 ## License
