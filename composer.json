@@ -1,6 +1,5 @@
 {
     "name": "featuretoggle/lib-php",
-    "version": "1.0.0",
     "description": "PHP Library to use Feature Toggle services",
     "title": "Feature Toggle PHP Library",
     "main": "./src",
